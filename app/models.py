@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 #Designing Model for a City
 class City(models.Model):
@@ -25,9 +26,10 @@ class Attraction(models.Model):
     
 # Designing Model for Review of each Attraction
 class Review(models.Model):
+    review_user = models.ForeignKey(User,on_delete=models.PROTECT,related_name='user')
     comment = models.TextField(max_length=255)
     rating = models.PositiveIntegerField(default=0)
     attractions = models.ForeignKey(Attraction,on_delete=models.PROTECT,related_name='reviews')
     
     def __str__(self):
-        return self.comment
+        return self.comment + ' by ' + self.review_user.username
