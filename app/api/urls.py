@@ -1,7 +1,7 @@
 from django.urls import path
 from app.api.views import ( CityCreateView, CityListView, CityRetrieveUpdateDestroyView,
                             AttractionCreateView, AttractionListView, AttractionRetrieveUpdateDestroyView,
-                            LoginTokenView, RegisterView, CreateReviewView, ReviewListView)
+                            LoginTokenView, RegisterView, CreateReviewView, ReviewListView, UserReviewListView)
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 urlpatterns = [
     path('create-city/',CityCreateView.as_view()),
@@ -15,5 +15,6 @@ urlpatterns = [
     path('login/',LoginTokenView.as_view()),
     path('register/',RegisterView.as_view()),
     path('attraction/<int:pk>/create-review/', CreateReviewView.as_view()),
-    path('attraction/<int:pk>/reviews',ReviewListView.as_view())
+    path('attraction/<int:pk>/reviews',ReviewListView.as_view()),
+    path('reviews/',UserReviewListView.as_view())
 ]

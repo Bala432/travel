@@ -11,6 +11,8 @@ from rest_framework.exceptions import ValidationError
 from django.contrib.auth.models import User
 from rest_framework.throttling import UserRateThrottle, AnonRateThrottle
 from app.api.throttling import AttractionListThrottle, ReviewListThrottle
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import SearchFilter, OrderingFilter
 
 # API for Login Tokens
 class LoginTokenView(APIView):
@@ -213,8 +215,30 @@ class CreateReviewView(CreateAPIView):
 class ReviewListView(ListAPIView):
     
     serializer_class = ReviewSerializer
-    throttle_classes = [ReviewListThrottle]
+    # throttle_classes = [ReviewListThrottle]
+    filter_backends = [DjangoFilterBackend]
+    
+    
     def get_queryset(self):
         pk = self.kwargs['pk']
         reviews = Review.objects.filter(attractions=pk)
         return reviews
+    
+# API for Listing Reviews of specific User
+class UserReviewListView(ListAPIView):
+    queryset = Attraction.objects.all()
+    serializer_class = AttractionSerializer
+    filter_backends = [OrderingFilter]
+    ordering_fields = ['average_rating']
+    
+    
+
+    # def get_queryset(self):
+    #     # username = self.kwargs['username']
+    #     # reviews = Review.objects.filter(review_user__username=username)
+        
+    #     username = self.request.query_params.get('username',None)
+    #     reviews = Review.objects.filter(review_user__username=username)
+    #     return reviews
+    
+    
