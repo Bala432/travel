@@ -14,6 +14,6 @@ urlpatterns = [
     path('api/token/refresh/',TokenRefreshView.as_view()),
     path('login/',LoginTokenView.as_view()),
     path('register/',RegisterView.as_view()),
-    path('attraction/<int:pk>/create-review', CreateReviewView.as_view()),
+    path('attraction/<int:pk>/create-review/', CreateReviewView.as_view()),
     path('attraction/<int:pk>/reviews',ReviewListView.as_view())
 ]

@@ -9,6 +9,8 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
 from rest_framework.exceptions import ValidationError
 from django.contrib.auth.models import User
+from rest_framework.throttling import UserRateThrottle, AnonRateThrottle
+from app.api.throttling import AttractionListThrottle, ReviewListThrottle
 
 # API for Login Tokens
 class LoginTokenView(APIView):
@@ -136,6 +138,7 @@ class AttractionListView(ListAPIView):
     
     permission_classes = [ IsAuthenticated ]
     serializer_class = AttractionSerializer
+    throttle_classes = [AttractionListThrottle]
     
     def get_queryset(self):
         print("self.kwargs is ",self.kwargs)
@@ -189,12 +192,13 @@ class CreateReviewView(CreateAPIView):
         
         user = self.request.user
         pk = self.kwargs['pk']
-        attraction = Attraction.objects.filter(pk=pk)
-        if attraction is None:
+        try:
+            attraction = Attraction.objects.get(pk=pk)
+        except Attraction.DoesNotExist:
             raise ValidationError({'Error':'This Place does not exist'})
         
-        review = Review.objects.filter(attraction=attraction,review_user=user)
-        if review is None:
+        review = Review.objects.filter(attractions=attraction,review_user=user)
+        if review.exists():
             raise ValidationError({'Error':'This Place is already reviewed'})
         
         if attraction.number_of_ratings == 0:
@@ -203,13 +207,13 @@ class CreateReviewView(CreateAPIView):
             attraction.average_rating = ( attraction.average_rating + serializer.validated_data['rating'] ) /2
         attraction.number_of_ratings = attraction.number_of_ratings + 1
         attraction.save()
-        serializer.save(attraction = attraction, review_user=user)
+        serializer.save(attractions = attraction, review_user=user)
         
 # API for Listing Reviews for specific Attraction
 class ReviewListView(ListAPIView):
     
-    serializer = ReviewSerializer
-    
+    serializer_class = ReviewSerializer
+    throttle_classes = [ReviewListThrottle]
     def get_queryset(self):
         pk = self.kwargs['pk']
         reviews = Review.objects.filter(attractions=pk)

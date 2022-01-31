@@ -47,7 +47,7 @@ class ReviewSerializer(serializers.ModelSerializer):
     review_user = serializers.StringRelatedField()
     class Meta:
         model = Review
-        fields = ('comment','rating')
+        fields = ('comment','rating','review_user')
         
 # Serializing User Model
 class UserSerializer(serializers.ModelSerializer):
